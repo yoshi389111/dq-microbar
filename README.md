@@ -1,7 +1,8 @@
 # DQ風のステッカーが作れます
 
-[![license](docs/images/license.svg)](LICENSE)
-&nbsp;![vanilla JS](docs/images/vanilla_js.svg)
+[![license](docs/images/badge_license.svg)](LICENSE)
+&nbsp;![JavaScript](docs/images/badge_javascript.svg)
+&nbsp;![vanilla JS](docs/images/badge_vanilla_js.svg)
 
 ## 使い方
 

@@ -296,7 +296,7 @@ const clacDotsLength = (str) => {
 }
 
 /**
- * 
+ * SVG 文字列を生成する
  * @param {string} text テキスト
  * @param {string} fg 前景色
  * @param {string} bg 背景色
@@ -359,15 +359,28 @@ const create = () => {
     document.getElementById('result').style.display = 'block';
 };
 
-const downloadSvg = () => {
-    const svg = document.getElementById('svgText').value;
-    const blob = new Blob([svg], { type: 'image/svg+xml' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'image.svg';
-    link.click();
-    URL.revokeObjectURL(url);
+const downloadSvg = async () => {
+    try {
+        const fileHandler = await window.showSaveFilePicker({
+            suggestedName: 'image',
+            types: [
+                {
+                    description: 'SVGファイル',
+                    accept: {
+                        'image/svg+xml': ['.svg'],
+                    },
+                },
+            ],
+        });
+        const writable = await fileHandler.createWritable();
+        const svg = document.getElementById('svgText').value;
+        const blob = new Blob([svg], { type: 'image/svg+xml' });
+        await writable.write(blob);
+        await writable.close();
+    } catch (e) {
+        console.error(e);
+        alert('SVGファイルのダウンロードに失敗しました');
+    }
 };
 
 const copySvgToClipboard = async () => {
@@ -406,26 +419,40 @@ const copyImageToClipboard = () => {
     image.src = url;
 }
 
-const downloadPng = () => {
-    const svg = document.getElementById('svgText').value;
-    const blob = new Blob([svg], { type: 'image/svg+xml' });
-    const url = URL.createObjectURL(blob);
-    const image = new Image();
-    image.onload = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = image.width;
-        canvas.height = image.height;
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(image, 0, 0);
-        const url = canvas.toDataURL('image/png');
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'image.png';
-        link.click();
-        URL.revokeObjectURL(url);
-    };
-    image.src = url;
+const downloadPng = async () => {
+    try {
+        const fileHandler = await window.showSaveFilePicker({
+            suggestedName: 'image',
+            types: [
+                {
+                    description: 'PNGファイル',
+                    accept: {
+                        'image/png': ['.png'],
+                    },
+                },
+            ],
+        });
+        const writable = await fileHandler.createWritable();
+        const svg = document.getElementById('svgText').value;
+        const blob = new Blob([svg], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+        const image = new Image();
+        image.onload = async () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = image.width;
+            canvas.height = image.height;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(image, 0, 0);
+            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+            await writable.write(blob);
+            await writable.close();
+        };
+        image.src = url;
+    } catch (e) {
+        console.error(e);
+        alert('PNGファイルのダウンロードに失敗しました');
+    }
 };
 </script>
 </head>
@@ -482,7 +509,7 @@ const downloadPng = () => {
     <li>その他、いくつかの記号などが使えます。以下の表を参照にしてください。</li>
 </ul>
 
-その他使える文字と、読み替え文字は以下の通りです（すべて大文字です）。
+その他使える文字と、読み替え文字は以下の通りです（すべて全角です）。
 
 <table>
     <tr><th>入力可能文字</th><th>意味</th><th>読み替え文字</th></tr>
@@ -539,7 +566,7 @@ const downloadPng = () => {
 <p>
 GitHub のリポジトリに貼ってあるライセンスバッジの代わりに使えます（自分のリポジトリに保存して使ってください）。<br />
 <textarea readonly>ライセンス：ＭＩＴ</textarea><br />
-<img src="images/license.svg" alt="ライセンスの例" width="128" height="24" />
+<img src="images/badge_license.svg" alt="ライセンスの例" width="128" height="24" />
 </p>
 
 <p>
@@ -551,7 +578,7 @@ GitHub のリポジトリに貼ってあるライセンスバッジの代わり�
 
 <p>
 夜の宿屋のセリフ風。前景色は "#3cf" です。<br />
-ちなみに、色は "#rgb" だけじゃなくて、"#rrggbb" でも "rgb(RR,GG,BB)" でも、"blue" 等でも指定可能です。<br />
+ちなみに、色は "#rgb" だけじゃなくて、"#rrggbb" でも "rgb(RR,GG,BB)" でも、"blue" 等でも、その他 SVG で指定可能な色なら大丈夫です。<br />
 <textarea readonly>＊こんなよふけに
   なんのごようかな？</textarea><br />
 <img src="images/konna_yofukeni.svg" alt="こんなよふけに" width="192" height="72" />
@@ -561,6 +588,13 @@ GitHub のリポジトリに貼ってあるライセンスバッジの代わり�
 「悪魔のしっぽ」の装備例です。前景色は "#e51"です。<br />
 <textarea readonly>Ｅ あくまのしっぽ 呪</textarea><br />
 <img src="images/akuma_no_shippo.svg" alt="悪魔のしっぽ" width="192" height="48" />
+</p>
+
+<p>
+「痛恨の一撃」のダメージ例です。前景色は "#3c3" です。<br />
+<textarea readonly>＊つうこんのいちげき
+  ２５６のダメージ！</textarea><br />
+<img src="images/tsuukon_no_ichigeki.svg" alt="痛恨の一撃" width="192" height="72" />
 </p>
 
 <footer>
