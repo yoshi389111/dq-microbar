@@ -325,18 +325,23 @@ const createSvg = (text, fg, bg, size) => {
 
     rows.forEach((row, i) => {
         const y = TOP_MARGIN + i * LINE_HEIGHT;
-        let x = LEFT_MARGIN;
-        row.split('').forEach(ch => {
-            if (ch === ' ') {
-                x += SPACE_WIDTH;
-            } else {
-                const path = pathMap.get(ch);
-                if (path) {
-                    svgText += `<path d="M${x} ${y}${path}" />\n`;
+        if (row === '＝＝＝') {
+            svgText += `<rect x="3" y="${y + 6}" width="${width-6}" height="2" />\n`;
+
+        } else {
+            let x = LEFT_MARGIN;
+            row.split('').forEach(ch => {
+                if (ch === ' ') {
+                    x += SPACE_WIDTH;
+                } else {
+                    const path = pathMap.get(ch);
+                    if (path) {
+                        svgText += `<path d="M${x} ${y}${path}" />\n`;
+                    }
+                    x += CHARACTER_WIDTH;
                 }
-                x += CHARACTER_WIDTH;
-            }
-        });
+            });
+        }
     });
 
     svgText += '</g>\n';
@@ -558,6 +563,7 @@ const downloadPng = async () => {
     <li>上記読み替え文字には記載していませんが「□」と「△」は半角スペース2個に読み替えます。</li>
     <li>読み替え可能になっていない記号や絵文字などは使えません（表示されません）。特に絵文字は表示が崩れる（空白が間延びする）こともあります。</li>
     <li>最後の無駄な改行は削除してから生成します。後ろに空白を作りたい場合には、スペースなどを入れてください。</li>
+    <li>一行に「＝＝＝」（全角のイコールを３つ）だけを入力すると、横線を引くことができます。</li>
     <li>十字架マークがありますが、特にキリスト教は関係ないはずです。</li>
 </ul>
 
@@ -595,6 +601,21 @@ GitHub のリポジトリに貼ってあるライセンスバッジの代わり�
 <textarea readonly>＊つうこんのいちげき
   ２５６のダメージ！</textarea><br />
 <img src="images/tsuukon_no_ichigeki.svg" alt="痛恨の一撃" width="192" height="72" />
+</p>
+
+<p>
+ステータス画面風のサンプルです。「＝＝＝」を入力すると、横線を引けます。<br />
+<textarea rows="9" readonly>　　　もょもと
+＝＝＝
+つよさ　　：　　１０
+かしこさ　：　　　９
+うん　　　：　　　３
+
+Ｅ こんぼう
+Ｅ かわのたて
+Ｅ あくまのしっぽ 呪
+</textarea><br />
+<img src="images/status_sample.svg" alt="ステータスのサンプル" width="96" height="120" />
 </p>
 
 <footer>
