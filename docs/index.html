@@ -289,7 +289,7 @@ const CHARACTER_WIDTH = 8;
  * @param {string} str 1行の文字
  * @returns {number} 文字を表すドット数
  */
-const clacDotsLength = (str) => {
+const calcDotsLength = (str) => {
     const spaceCount = (str.match(/ /g) || []).length;
     const charCount = str.length - spaceCount;
     return charCount * CHARACTER_WIDTH + spaceCount * SPACE_WIDTH;
@@ -315,7 +315,7 @@ const createSvg = (text, fg, bg, size) => {
     const rows = text.replace(/(\r?\n)*$/, "").split('\n');
 
     const height = rows.length * LINE_HEIGHT + TOP_MARGIN + BOTTOM_MARGIN;
-    const width = rows.reduce((max, row) => Math.max(max, clacDotsLength(row)), 0)
+    const width = rows.reduce((max, row) => Math.max(max, calcDotsLength(row)), 0)
         + LEFT_MARGIN + RIGHT_MARGIN;
 
     let svgText = `<svg xmlns="http://www.w3.org/2000/svg" width="${width * size}" height="${height * size}" viewBox="0 0 ${width} ${height}">\n`;
@@ -378,7 +378,7 @@ const downloadSvg = async () => {
             ],
         });
         const writable = await fileHandler.createWritable();
-        const svg = document.getElementById('svgText').value;
+        const svg = document.getElementById('svgText').innerHTML;
         const blob = new Blob([svg], { type: 'image/svg+xml' });
         await writable.write(blob);
         await writable.close();
@@ -390,7 +390,7 @@ const downloadSvg = async () => {
 
 const copySvgToClipboard = async () => {
     try {
-        const svg = document.getElementById('svgText').value;
+        const svg = document.getElementById('svgText').innerHTML;
         await navigator.clipboard.writeText(svg);
         alert('SVG文字列をクリップボードにコピーしました');
     } catch (e) {
@@ -400,7 +400,7 @@ const copySvgToClipboard = async () => {
 };
 
 const copyImageToClipboard = () => {
-    const svg = document.getElementById('svgText').value;
+    const svg = document.getElementById('svgText').innerHTML;
     const blob = new Blob([svg], { type: 'image/svg+xml' });
     const url = URL.createObjectURL(blob);
     const image = new Image();
@@ -438,7 +438,7 @@ const downloadPng = async () => {
             ],
         });
         const writable = await fileHandler.createWritable();
-        const svg = document.getElementById('svgText').value;
+        const svg = document.getElementById('svgText').innerHTML;
         const blob = new Blob([svg], { type: 'image/svg+xml' });
         const url = URL.createObjectURL(blob);
         const image = new Image();
